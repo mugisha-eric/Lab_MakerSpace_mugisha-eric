@@ -1,0 +1,14 @@
+# Python-generated files
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Local application data and settings
+makerspace.db
+*.db-journal
+.env
+
+# Operating-system files
+.DS_Store
