@@ -3,7 +3,7 @@
 Build the menu loop and input-validation helpers here.
 """
 
-
+ 
 def main() -> None:
     """Start the menu-driven application."""
     print("Campus MakerSpace Checkout System")
