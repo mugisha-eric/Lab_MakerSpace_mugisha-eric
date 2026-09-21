@@ -358,7 +358,17 @@ class MakerSpaceApp:
 
         token = make_token(member.member_id, equipment.equipment_id)
         checkout = date.today()
-        due = checkout + timedelta(days=LOAN_PERIOD_DAYS)
+
+        # ask for due date other than default
+        due_input = ask(f"Due date (default {checkout + timedelta(days=LOAN_PERIOD_DAYS)}) - click Enter to accept default", default="")
+        if due_input:
+            try:
+                due = datetime.strptime(due_input, "%Y-%m-%d").date()
+            except ValueError:
+                say("Invalid date format. Use YYYY-MM-DD.", "red")
+                return
+        else:
+            due = checkout + timedelta(days=LOAN_PERIOD_DAYS)
 
         loan_id = db.create_loan(member.member_id, equipment.equipment_id, checkout.isoformat(), due.isoformat(), token)
         db.set_equipment_availability(equipment.equipment_id, False)
