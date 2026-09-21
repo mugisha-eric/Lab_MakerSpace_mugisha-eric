@@ -35,4 +35,3 @@ class Loan:
 
     def __str__(self):
         return f"Loan({self.loan_id}, Member ID: {self.member_id}, Equipment ID: {self.equipment_id}, Checkout: {self.checkout_date}, Due: {self.due_date}, Returned: {self.returned_date})"
-
