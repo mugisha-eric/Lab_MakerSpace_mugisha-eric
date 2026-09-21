@@ -367,6 +367,10 @@ class MakerSpaceApp:
             except ValueError:
                 say("Invalid date format. Use YYYY-MM-DD.", "red")
                 return
+        # check if due date is in the past
+        elif due_input and datetime.strptime(due_input, "%Y-%m-%d").date() < checkout:
+            say("Due date cannot be in the past.", "red")
+            return
         else:
             due = checkout + timedelta(days=LOAN_PERIOD_DAYS)
 

@@ -1,90 +1,148 @@
 # Campus MakerSpace Checkout System
 
-A menu-driven Python application for managing MakerSpace members, equipment, and equipment loans. The application will store its data in a local SQLite database so records persist between runs.
+An interactive command-line app for running a campus makerspace's front desk for 
+registering members and equipment, checking items in and out, tracking overdue loans,
+and pulling reports, all from an interactive colored, arrow-key-navigable terminal UI.
 
-> **Assessment repository:** This project is being developed for the BSc (Hons) Software Engineering module *Introduction to Programming and Databases* (August–October 2026).
+## Features
 
-## Project status
+- **Arrow-key menu** (via `questionary`), with a plain numbered fallback if it isn't installed
+- **Command palette** — type a word like `checkout`, `return`, or `search drill` instead of a menu number
+- **Color-coded dashboard** — a `rich` table view showing equipment as Available / Checked out / **OVERDUE**
+- **Overdue alerts** shown automatically the moment the app opens
+- **Checkout tokens** — every loan gets a short, memorable ticket like `LOAN-7F2K` instead of a raw database ID
+- **Cancel anywhere** — type `cancel`, `back`, `esc`, or `:q` at any prompt to back out of what you're doing
+- **Confirmation prompts** before registering, deleting, or undoing anything
+- **Duplicate checks** — won't register a member with an email already on file, or equipment with a name already in use
+- **One-step Undo** for the last create action (register member, register equipment, checkout)
+- **Delete member / delete equipment**, with a confirmation step
+- **Three built-in reports** — Operation Status, Health & Condition, and Utilization
+- **Fuzzy search** — typo-tolerant matching against member and equipment names
+- **Persistent storage** via SQLite (`makerspace.db`), so data survives restarts
+- **Screen clears after every action**, right before the menu redraws, so the terminal doesn't get cluttered
 
-This repository is intentionally set up as a design-and-implementation starter. Complete each item below yourself and make sure you can explain every part during the live demonstration.
+## Requirements
 
-- [x] Repository layout and initial database design
-- [ ] Implement domain classes in `models.py`
-- [ ] Implement database connection and SQL helpers in `database.py`
-- [ ] Implement checkout/return business rules in `services.py`
-- [ ] Implement the menu and input validation in `main.py`
-- [ ] Test all menu paths with sample data
+- Python 3.10+
+- Optional, for the full interactive experience:
+  - [`rich`](https://github.com/Textualize/rich) — color output, tables, panels
+  - [`questionary`](https://github.com/tmbo/questionary) — arrow-key menu navigation
 
-## Planned features
+Without these two packages the app still runs in full, just in a plain-text
+fallback mode (numbered menus, no color).
 
-1. Register, list, and update members.
-2. Register, list, and update equipment, including its availability.
-3. Check out equipment only when the member exists and the item is available.
-4. Return a loan and update the equipment availability.
-5. Search for a member or an equipment item by name or ID.
-6. Run at least two reports: current loans, overdue loans, equipment by category, or member loan history.
+## Installation
 
-## Project structure
-
-```text
-.
-├── main.py          # Menu loop and application entry point
-├── models.py        # Member, Equipment, and Loan classes
-├── database.py      # SQLite connection, schema setup, and SQL helpers
-├── services.py      # Business rules coordinating models and database
-├── schema.sql       # Initial SQLite table design
-├── README.md        # Setup, design, and assessment notes
-└── .gitignore       # Excludes local database and temporary files
+```bash
+git clone https://github.com/mugisha-eric/Lab_MakerSpace_mugisha-eric.git
+cd Lab_MakerSpace_mugisha-eric
+pip install -r requirements.txt
 ```
 
-## Design overview
 
-### Classes
-
-| Class | Responsibility | Example behaviour to implement |
-| --- | --- | --- |
-| `Member` | Represents a MakerSpace member. | Validate or format member details. |
-| `Equipment` | Represents an inventory item. | Check whether the item is available. |
-| `Loan` | Represents a checkout transaction. | Determine whether a loan is overdue. |
-
-### Database tables
-
-- `members`: one record per member.
-- `equipment`: one record per lendable item, with a category and availability status.
-- `loans`: one record per checkout, linked to a member and an equipment item by foreign keys.
-
-The starting schema is in `schema.sql`. The eventual application should create the database automatically on its first run or clearly document how to run the schema.
-
-## Running the application
-
-The intended final program uses only Python's standard library, including `sqlite3`, so no package installation should be necessary.
+## Running the app
 
 ```bash
 python3 main.py
 ```
 
-## Suggested implementation order
+On first run, `main.py` calls `database.create_tables()`, which creates
+`makerspace.db` in the current directory if it doesn't already exist. No
+manual setup is required.
 
-1. Read `schema.sql` and draw a quick relationship diagram: one member can have many loans; one equipment item can have many loans over time.
-2. Build the three domain classes and give each meaningful methods.
-3. Add database setup and simple member/equipment CRUD operations.
-4. Add checkout and return operations, including validation.
-5. Add search and reports, then test invalid input and edge cases.
-6. Commit small, meaningful milestones to GitHub.
+## Project structure
 
-## GitHub submission checklist
+```
+.
+├── main.py             # Interactive CLI — menu, prompts, dashboard, reports
+├── database.py          # SQLite connection, schema, and parameterized queries
+├── models.py             # Member / Equipment / Loan domain objects
+├── requirements.txt
+└── makerspace.db          # created automatically on first run (not checked in)
+```
 
-- [ ] Rename the repository to `Lab_MakerSpace_<your-GitHub-username>` if needed.
-- [ ] Keep source files, `schema.sql`, and this README committed.
-- [ ] Do **not** commit `makerspace.db` unless your lecturer explicitly asks for a populated database file.
-- [ ] Add clear comments only where they explain a design decision or non-obvious logic.
-- [ ] Make sure the project runs from a fresh clone.
-- [ ] Submit the public repository link on Canvas and be ready to explain the code live.
+
+`main.py` never writes raw SQL, and `database.py` never formats anything for
+display — each layer only talks to the one below it.
+
+## Main menu
+
+| # | Option | Description |
+|---|---|---|
+| 1 | Register Member | Add a new member. Rejects duplicate emails. |
+| 2 | List Members | Display all members with status (Active/Inactive). |
+| 3 | Update Member | Edit an existing member's details. |
+| 4 | Delete Member | Remove a member, after confirmation. |
+| 5 | Register Equipment | Add new equipment. Rejects duplicate names. |
+| 6 | List Equipment | Display Colored table of equipment: green = available, yellow = checked out, red = **OVERDUE**. |
+| 7 | Update Equipment | Edit an existing item's details. |
+| 8 | Delete Equipment | Remove an item, after confirmation. |
+| 9 | Create Loan (Checkout) | Pick a member and an available item and select custom or default due date. |
+| 10 | Return Loan | Pick an open loan to close out and free up the equipment. |
+| 11 | Operation Status Report | Quick counts: total members, total equipment, open loans, overdue loans. |
+| 12 | Health and Condition Report | Equipment grouped by condition (Good / Needs Repair / etc.), with counts. |
+| 13 | Utilization Report | How many times each piece of equipment has been borrowed. |
+| `undo` | Undo Last Action | Reverses the most recent register/checkout, with a confirmation prompt. |
+| `0` | Exit | Closes the database connection and quits. |
+
+
+### Canceling out of a prompt
+
+Type `cancel`, `back`, `esc`, or `:q` at any text prompt (member name, email,
+equipment description, etc.) to back out. Use `Ctrl + C` to go back when there is no input option. 
+
+# Design overview
+
+## Classes
+
+| Class | Responsibility |
+| --- | --- |
+| `Member` | Represents a MakerSpace member. |
+| `Equipment` | Represents an inventory item. |
+| `Loan` | Represents a checkout transaction. |
+
+
+## Data model
+
+### Member
+| Field | Type |
+|---|---|
+| `member_id` | int |
+| `full_name` | str |
+| `email` | str |
+| `phone` | str |
+| `active` | bool |
+
+### Equipment
+| Field | Type |
+|---|---|
+| `equipment_id` | int |
+| `name` | str |
+| `category` | str |`"General"` |
+| `item_condition` | str |
+| `description` | str |
+| `is_available` | bool |
+
+### Loan
+| Field | Type |
+|---|---|
+| `loan_id` | int |
+| `token` | str |
+| `member_id` / `equipment_id` | int |
+| `checkout_date` / `due_date` | date |(`LOAN_PERIOD_DAYS`) |
+| `returned_date` | date or None |
+
+
+## Reports
+
+- **Operation Status Report** — a snapshot: how many members, how much equipment,
+  how many open loans, how many are currently overdue.
+- **Health and Condition Report** — equipment grouped and counted by `item_condition`,
+  useful for spotting how much gear needs repair or replacement.
+- **Utilization Report** — how many times each item has ever been borrowed, to see
+  what's getting the most (or least) use.
+
 
 ## AI-use acknowledgement
 
-Generative AI was used as a learning and setup aid to organise the initial repository structure, outline the SQLite schema, and improve this documentation. All final implementation code is reviewed, understood, tested, and explained by the student. Update this statement to accurately reflect any further assistance used.
-
-## References
-
-Add any external sources or adapted snippets here in APA 7 style, with links. Include a short code comment next to each adapted snippet explaining its source.
+Generative AI was used as a learning and setup aid to organise the initial repository structure, outline the `SQLite` schema, and improve this documentation. All final implementation code is orginally written, reviewed, understood, tested, and explained by the student.
