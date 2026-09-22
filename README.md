@@ -134,7 +134,7 @@ equipment description, etc.) to back out. Use `Ctrl + C` to go back when there i
 
 ## Database Schemas
 
-![Database schema image](schema.png)
+![Database schema image](schemas.png)
 
 
 ## Reports
