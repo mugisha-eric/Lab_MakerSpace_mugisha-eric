@@ -42,9 +42,15 @@ pip install -r requirements.txt
 
 ## Running the app
 
+To run app, you can choose to load sample data into main database using: 
+```bash
+sqlite3 makerspace.db < sample_data.sql # optional sample data
+```
+Then Execute main program by command:
 ```bash
 python3 main.py
 ```
+
 
 On first run, `main.py` calls `database.create_tables()`, which creates
 `makerspace.db` in the current directory if it doesn't already exist. No
