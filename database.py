@@ -1,4 +1,5 @@
 import sqlite3 as sq
+from typing import List
 
 conn = sq.connect("makerspace.db")
 conn.row_factory = sq.Row
@@ -62,7 +63,7 @@ def add_member(name: str, email: str, phone: str = "") -> int:
     return cur.lastrowid
 
 
-def list_members() -> list[sq.Row]:
+def list_members() -> List[sq.Row]:
     """Return a list of all members in the database."""
     cur.execute("SELECT * FROM members ORDER BY name")
     return cur.fetchall()
@@ -89,12 +90,12 @@ def delete_member(member_id: int) -> None:
     conn.commit()
 
 
-def search_members_by_name(name: str) -> list[sq.Row]:
+def search_members_by_name(name: str) -> List[sq.Row]:
     """Search for members by name."""
     cur.execute("SELECT * FROM members WHERE name LIKE ?", (f"%{name}%",))
     return cur.fetchall()
 
-def search_members_by_email(email: str) -> list[sq.Row]:
+def search_members_by_email(email: str) -> List[sq.Row]:
     """Search for members by email."""
     cur.execute("SELECT * FROM members WHERE email LIKE ?", (f"%{email}%",))
     return cur.fetchall()
@@ -114,13 +115,13 @@ def add_equipment(name: str, category: str = "General", description: str = "", c
     return cur.lastrowid
 
 
-def list_equipment() -> list[sq.Row]:
+def list_equipment() -> List[sq.Row]:
     """Return a list of all equipment in the database."""
     cur.execute("SELECT * FROM equipment ORDER BY name")
     return cur.fetchall()
 
 
-def list_available_equipment() -> list[sq.Row]:
+def list_available_equipment() -> List[sq.Row]:
     """Return only equipment currently available for checkout."""
     cur.execute("SELECT * FROM equipment WHERE available = 1 ORDER BY name")
     return cur.fetchall()
@@ -148,7 +149,7 @@ def delete_equipment(equipment_id: int) -> None:
     conn.commit()
 
 
-def search_equipment_by_name(name: str) -> list[sq.Row]:
+def search_equipment_by_name(name: str) -> List[sq.Row]:
     """Search for equipment by name."""
     cur.execute("SELECT * FROM equipment WHERE name LIKE ?", (f"%{name}%",))
     return cur.fetchall()
@@ -201,13 +202,13 @@ def delete_loan(loan_id: int) -> None:
     conn.commit()
 
 
-def list_loans() -> list[sq.Row]:
+def list_loans() -> List[sq.Row]:
     """Return a list of all loan records in the database."""
     cur.execute("SELECT * FROM loans ORDER BY loan_date DESC")
     return cur.fetchall()
 
 
-def list_loans_with_names() -> list[sq.Row]:
+def list_loans_with_names() -> List[sq.Row]:
     """Return every loan (open or closed), joined with member and equipment
     names — used by the CSV export report."""
     cur.execute(
@@ -231,7 +232,7 @@ def get_loan_count_for_equipment(equipment_id: int) -> int:
     return result["loan_count"] if result else 0
 
 
-def list_open_loans() -> list[sq.Row]:
+def list_open_loans() -> List[sq.Row]:
     """Return active (not-yet-returned) loans, joined with member and
     equipment names for display."""
     cur.execute(
@@ -253,25 +254,25 @@ def get_loan_by_token(token: str) -> sq.Row | None:
     return cur.fetchone()
 
 
-def get_loans_by_member(member_id: int) -> list[sq.Row]:
+def get_loans_by_member(member_id: int) -> List[sq.Row]:
     """Retrieve all loan records for a specific member."""
     cur.execute("SELECT * FROM loans WHERE member_id = ?", (member_id,))
     return cur.fetchall()
 
 
-def get_loans_by_equipment(equipment_id: int) -> list[sq.Row]:
+def get_loans_by_equipment(equipment_id: int) -> List[sq.Row]:
     """Retrieve all loan records for a specific piece of equipment."""
     cur.execute("SELECT * FROM loans WHERE equipment_id = ?", (equipment_id,))
     return cur.fetchall()
 
 
-def get_active_loans() -> list[sq.Row]:
+def get_active_loans() -> List[sq.Row]:
     """Retrieve all active (not returned) loan records."""
     cur.execute("SELECT * FROM loans WHERE return_date IS NULL")
     return cur.fetchall()
 
 
-def get_overdue_loans(current_date: str) -> list[sq.Row]:
+def get_overdue_loans(current_date: str) -> List[sq.Row]:
     """Retrieve all overdue loan records: still open and past their due date."""
     cur.execute(
         "SELECT * FROM loans WHERE return_date IS NULL AND due_date < ?",
@@ -283,7 +284,7 @@ def get_overdue_loans(current_date: str) -> list[sq.Row]:
 # ---------------------------------------------------------------------------
 # Reports
 # ---------------------------------------------------------------------------
-def get_top_borrowers(limit: int = 5) -> list[sq.Row]:
+def get_top_borrowers(limit: int = 5) -> List[sq.Row]:
     """Members with the most loans overall, most-active first."""
     cur.execute(
         """
@@ -299,7 +300,7 @@ def get_top_borrowers(limit: int = 5) -> list[sq.Row]:
     return cur.fetchall()
 
 
-def get_popular_equipment(limit: int = 5) -> list[sq.Row]:
+def get_popular_equipment(limit: int = 5) -> List[sq.Row]:
     """Equipment borrowed the most often, most-popular first."""
     cur.execute(
         """
