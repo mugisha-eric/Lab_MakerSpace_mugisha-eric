@@ -505,7 +505,9 @@ class MakerSpaceApp:
                 say("0. Exit")
                 raw = ask("Select an option or type a command").strip().lower()
                 if raw == "0":
-                    break
+                    # confirm exit before quitting
+                    if confirm("Are you sure you want to exit?"):
+                        break
                 key = aliases.get(raw, raw)
                 if raw.startswith("search "):
                     # e.g. "search drill" -> jump straight into equipment search with the term
