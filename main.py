@@ -494,7 +494,9 @@ class MakerSpaceApp:
                 labels += ["undo. Undo Last Action", "0. Exit"]
                 choice = questionary.select("Main Menu:", choices=labels).ask()
                 if choice is None or choice.startswith("0"):
-                    break
+                    if confirm("Are you sure you want to exit?"):
+                        break
+                    continue
                 key = choice.split(".")[0]
             else:
                 say("\nMain Menu:")
