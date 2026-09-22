@@ -46,6 +46,8 @@ To run app, you can choose to load sample data into main database using:
 ```bash
 sqlite3 makerspace.db < sample_data.sql # optional sample data
 ```
+NOTE: make sure you have sqlite3 installed before executing above command.
+
 Then Execute main program by command:
 ```bash
 python3 main.py
