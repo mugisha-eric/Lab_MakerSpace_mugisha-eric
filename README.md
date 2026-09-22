@@ -132,6 +132,10 @@ equipment description, etc.) to back out. Use `Ctrl + C` to go back when there i
 | `checkout_date` / `due_date` | date |(`LOAN_PERIOD_DAYS`) |
 | `returned_date` | date or None |
 
+## Database Schemas
+
+![Database schema image](schema.png)
+
 
 ## Reports
 
